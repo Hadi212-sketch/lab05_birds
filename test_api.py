@@ -29,6 +29,19 @@ def section(title):
 
 
 # ------------------------------------------------------------------
+section("0. CLEANUP — wipe existing data")
+# ------------------------------------------------------------------
+# Delete all birdspottings first, then birds, then species (respects FK order)
+for resource in ["birdspotting", "birds", "species"]:
+    r = requests.get(f"{BASE}/{resource}/")
+    if r.status_code == 200:
+        for item in r.json():
+            rid = item.get("id")
+            if rid:
+                requests.delete(f"{BASE}/{resource}/{rid}")
+print("  🧹 Database cleaned\n")
+
+# ------------------------------------------------------------------
 section("1. ROOT ENDPOINT")
 # ------------------------------------------------------------------
 r = requests.get(f"{BASE}/")
