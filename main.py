@@ -1,12 +1,15 @@
 from fastapi import FastAPI
 
 from database import start_db
+from routers import species
 
 app = FastAPI(
     title="Birds API",
     description="A FastAPI project for managing bird species, individual birds, and birdspotting observations.",
     version="1.0.0",
 )
+
+app.include_router(species.router)
 
 
 @app.on_event("startup")
