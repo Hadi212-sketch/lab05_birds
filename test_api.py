@@ -257,13 +257,13 @@ section("20. DELETE — CASCADE TEST")
 # ------------------------------------------------------------------
 # Delete bird_ids[0] (Pip) — should cascade-delete its 2 birdspottings
 r = requests.delete(f"{BASE}/birds/{bird_ids[0]}")
-test("DELETE /birds/ (Pip) returns 204", r.status_code == 204)
+test("DELETE /birds/ (Pip) returns 204", r.status_code == 204, f"got {r.status_code}: {r.text[:200]}")
 
 r = requests.get(f"{BASE}/birdspotting/{spotting_ids[0]}")
-test("Pip's spotting 1 cascade-deleted (404)", r.status_code == 404)
+test("Pip's spotting 1 cascade-deleted (404)", r.status_code == 404, f"got {r.status_code}")
 
 r = requests.get(f"{BASE}/birdspotting/{spotting_ids[1]}")
-test("Pip's spotting 2 cascade-deleted (404)", r.status_code == 404)
+test("Pip's spotting 2 cascade-deleted (404)", r.status_code == 404, f"got {r.status_code}")
 
 # ------------------------------------------------------------------
 section("21. DELETE — RESTRICT TEST")
@@ -277,10 +277,10 @@ section("22. DELETE — SPECIES (clean up)")
 # ------------------------------------------------------------------
 # Delete bird first, then species
 r = requests.delete(f"{BASE}/birds/{bird_ids[1]}")
-test("DELETE bird Rusty returns 204", r.status_code == 204)
+test("DELETE bird Rusty returns 204", r.status_code == 204, f"got {r.status_code}: {r.text[:200]}")
 
 r = requests.delete(f"{BASE}/species/{species_ids[1]}")
-test("DELETE species (no birds) returns 204", r.status_code == 204)
+test("DELETE species (no birds) returns 204", r.status_code == 204, f"got {r.status_code}: {r.text[:200]}")
 
 # Delete non-existent
 r = requests.delete(f"{BASE}/species/99999")

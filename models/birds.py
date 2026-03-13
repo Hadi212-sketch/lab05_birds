@@ -26,7 +26,10 @@ class Bird(BirdBase, table=True):
     species_id: int = Field(foreign_key="species.id")
 
     species: Optional["Species"] = Relationship(back_populates="birds")
-    birdspottings: List["Birdspotting"] = Relationship(back_populates="bird")
+    birdspottings: List["Birdspotting"] = Relationship(
+        back_populates="bird",
+        sa_relationship_kwargs={"passive_deletes": True},
+    )
 
 
 class BirdCreate(BirdBase):
