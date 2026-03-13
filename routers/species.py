@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 
 from database import get_session
-from models.species import Species, SpeciesCreate, SpeciesRead
+from models.birds import BirdReadNested
+from models.species import Species, SpeciesCreate, SpeciesRead, SpeciesReadWithBirds
 from repositories.species import SpeciesRepository
 
 router = APIRouter(prefix="/species", tags=["Species"])
@@ -31,16 +32,32 @@ async def get_species(
     )
 
 
-@router.get("/{species_id}", response_model=SpeciesRead)
+@router.get("/{species_id}", response_model=SpeciesReadWithBirds)
 async def get_species_by_id(
     species_id: int,
     repo: Annotated[SpeciesRepository, Depends(get_species_repository)],
 ):
-    """Get a single species by id."""
+    """Get a single species by id, including its birds (back-reference)."""
     item = repo.get_one(species_id)
     if not item:
         raise HTTPException(status_code=404, detail="Species not found")
     return item
+
+
+@router.get("/{species_id}/birds", response_model=List[BirdReadNested])
+async def get_birds_by_species(
+    species_id: int,
+    repo: Annotated[SpeciesRepository, Depends(get_species_repository)],
+    offset: int = Query(default=0, ge=0, description="Number of records to skip"),
+    limit: int = Query(default=100, ge=1, le=1000, description="Max records to return"),
+):
+    """Get all birds belonging to a specific species."""
+    item = repo.get_one(species_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Species not found")
+    # Apply manual pagination on the relationship list
+    birds = item.birds[offset : offset + limit]
+    return birds
 
 
 @router.post("/", response_model=SpeciesRead, status_code=201)
