@@ -10,6 +10,209 @@ from bird_api_client import BirdAPIClient, BirdAPIError
 APP_TITLE = "Birds Viewer"
 DEFAULT_WINGSPAN_CM = 50
 DEFAULT_CONSERVATION_STATUS = "Least Concern"
+APP_THEME = gr.themes.Soft(
+    primary_hue="teal",
+    secondary_hue="amber",
+    neutral_hue="stone",
+)
+APP_CSS = """
+.gradio-container {
+  font-family: "Montserrat", "Aptos", "Trebuchet MS", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(125, 196, 173, 0.26), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(226, 181, 95, 0.22), transparent 20%),
+    linear-gradient(180deg, #f3efe7 0%, #f7f3ea 100%);
+}
+footer {
+  display: none !important;
+}
+.hero-card {
+  background:
+    radial-gradient(circle at top right, rgba(255, 226, 168, 0.18), transparent 24%),
+    linear-gradient(135deg, rgba(30, 46, 57, 0.97), rgba(50, 74, 67, 0.94));
+  color: #f8f4eb;
+  padding: 1.6rem 1.8rem;
+  border-radius: 28px;
+  box-shadow: 0 20px 46px rgba(34, 41, 36, 0.18);
+  margin-bottom: 1rem;
+}
+.hero-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.74rem;
+  opacity: 0.74;
+  margin-bottom: 0.55rem;
+}
+.hero-card h1 {
+  margin: 0;
+  font-size: 2.15rem;
+  line-height: 1.05;
+}
+.hero-card p {
+  margin: 0.85rem 0 0;
+  max-width: 55rem;
+  color: rgba(248, 244, 235, 0.9);
+}
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(247, 241, 227, 0.14);
+  background: rgba(247, 241, 227, 0.08);
+  color: rgba(247, 241, 227, 0.92);
+  border-radius: 999px;
+  padding: 0.42rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.mode-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.9rem;
+  margin: 0.35rem 0 1.15rem;
+}
+.mode-card {
+  background: rgba(255, 252, 246, 0.74);
+  border: 1px solid rgba(96, 83, 66, 0.1);
+  border-radius: 22px;
+  padding: 1rem 1.05rem 0.95rem;
+  box-shadow: 0 14px 30px rgba(55, 43, 33, 0.08);
+}
+.mode-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  color: #f7fbfa;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.mode-card h3 {
+  margin: 0.8rem 0 0.3rem;
+  font-size: 1rem;
+  color: #34281f;
+}
+.mode-card p {
+  margin: 0;
+  color: #6d5a4b;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+.viewer-shell {
+  background: rgba(255, 250, 242, 0.65);
+  border: 1px solid rgba(109, 87, 68, 0.12);
+  border-radius: 28px;
+  padding: 1rem;
+  box-shadow: 0 18px 38px rgba(57, 42, 28, 0.1);
+  backdrop-filter: blur(8px);
+}
+.viewer-shell [role="tablist"] {
+  gap: 0.45rem;
+  padding: 0.1rem 0 0.7rem;
+  border-bottom: 1px solid rgba(80, 67, 54, 0.18);
+}
+.viewer-shell [role="tab"] {
+  color: #7b6550 !important;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.6rem 1rem !important;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.viewer-shell [role="tab"]:hover {
+  color: #2c231b !important;
+  background: rgba(255, 255, 255, 0.62);
+}
+.viewer-shell [role="tab"][aria-selected="true"] {
+  color: #f6fcfb !important;
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.22);
+}
+.viewer-shell [role="tabpanel"] {
+  padding-top: 0.55rem;
+}
+.panel-heading {
+  margin: 0 0 0.95rem;
+}
+.panel-kicker {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #11796f;
+  margin-bottom: 0.35rem;
+}
+.panel-heading h2 {
+  margin: 0;
+  font-size: 1.28rem;
+  color: #33271f;
+}
+.panel-heading p {
+  margin: 0.35rem 0 0;
+  color: #6d5a4b;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+.viewer-shell .prose,
+.viewer-shell .prose p,
+.viewer-shell .prose li {
+  color: #5e4c3e !important;
+}
+.viewer-shell label,
+.viewer-shell .block-label {
+  color: #4b3c31 !important;
+  font-weight: 700;
+}
+.viewer-shell button.primary {
+  background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
+  color: #fff8ef !important;
+  border: none !important;
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.2);
+}
+.viewer-shell button.secondary {
+  background: linear-gradient(135deg, #55606d, #39414a) !important;
+  color: #fff8ef !important;
+  border: none !important;
+}
+.viewer-shell button.primary:hover,
+.viewer-shell button.secondary:hover {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+.viewer-shell .wrap {
+  border-radius: 18px !important;
+}
+.status-card {
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+.status-card.success {
+  background: rgba(86, 140, 122, 0.11);
+  border-color: rgba(86, 140, 122, 0.24);
+  color: #183d31;
+}
+.status-card.error {
+  background: rgba(165, 76, 71, 0.1);
+  border-color: rgba(165, 76, 71, 0.22);
+  color: #5d1d19;
+}
+.status-card.neutral {
+  background: rgba(102, 88, 74, 0.08);
+  border-color: rgba(102, 88, 74, 0.14);
+  color: #43362b;
+}
+"""
 SPECIES_COLUMNS = [
     "id",
     "name",
@@ -66,6 +269,11 @@ KNOWN_BIRD_FAMILIES = sorted(
 def empty_dataframe(columns: list[str]) -> pd.DataFrame:
     """Create a typed empty dataframe with stable columns for Gradio."""
     return pd.DataFrame(columns=columns)
+
+
+def render_status(message: str, tone: str = "neutral") -> str:
+    """Render a styled HTML status message."""
+    return f"<div class='status-card {tone}'>{message}</div>"
 
 
 def normalize_filter(value: Optional[str]) -> Optional[str]:
@@ -219,11 +427,16 @@ def refresh_species_data(
             conservation_status=normalize_filter(conservation_status)
         )
     except BirdAPIError as exc:
-        return empty_dataframe(SPECIES_COLUMNS), f"Species refresh failed: {exc}"
+        return empty_dataframe(SPECIES_COLUMNS), render_status(
+            f"Species refresh failed: {exc}", "error"
+        )
 
     return (
         build_species_dataframe(species_items),
-        f"Loaded {len(species_items)} species from {client.base_url}.",
+        render_status(
+            f"Loaded {len(species_items)} species from {client.base_url}.",
+            "success",
+        ),
     )
 
 
@@ -237,7 +450,7 @@ def refresh_birds_data(
     except BirdAPIError as exc:
         return (
             empty_dataframe(BIRDS_COLUMNS),
-            f"Bird refresh failed: {exc}",
+            render_status(f"Bird refresh failed: {exc}", "error"),
             gr.update(choices=[], value=None),
         )
 
@@ -246,7 +459,9 @@ def refresh_birds_data(
     default_species_id = species_choices[0][1] if species_choices else None
     return (
         build_birds_dataframe(bird_items, species_lookup),
-        f"Loaded {len(bird_items)} birds from {client.base_url}.",
+        render_status(
+            f"Loaded {len(bird_items)} birds from {client.base_url}.", "success"
+        ),
         gr.update(choices=species_choices, value=default_species_id),
     )
 
@@ -264,7 +479,7 @@ def refresh_sightings_data(
     except BirdAPIError as exc:
         return (
             empty_dataframe(SIGHTINGS_COLUMNS),
-            f"Sightings refresh failed: {exc}",
+            render_status(f"Sightings refresh failed: {exc}", "error"),
             gr.update(choices=[], value=None),
         )
 
@@ -274,7 +489,10 @@ def refresh_sightings_data(
     default_bird_id = bird_choices[0][1] if bird_choices else None
     return (
         build_sightings_dataframe(sighting_items, bird_lookup, species_lookup),
-        f"Loaded {len(sighting_items)} sightings from {client.base_url}.",
+        render_status(
+            f"Loaded {len(sighting_items)} sightings from {client.base_url}.",
+            "success",
+        ),
         gr.update(choices=bird_choices, value=default_bird_id),
     )
 
@@ -295,7 +513,10 @@ def create_species_action(
     if not all([cleaned_name, cleaned_scientific_name, cleaned_family]):
         dataframe, _ = refresh_species_data(client, active_filter)
         return (
-            "Species could not be created: fill in name, scientific name, and family.",
+            render_status(
+                "Species could not be created: fill in name, scientific name, and family.",
+                "error",
+            ),
             dataframe,
             name,
             scientific_name,
@@ -309,7 +530,10 @@ def create_species_action(
     except (InvalidOperation, ValueError):
         dataframe, _ = refresh_species_data(client, active_filter)
         return (
-            "Species could not be created: wingspan must be a valid number.",
+            render_status(
+                "Species could not be created: wingspan must be a valid number.",
+                "error",
+            ),
             dataframe,
             name,
             scientific_name,
@@ -332,7 +556,7 @@ def create_species_action(
     except BirdAPIError as exc:
         dataframe, _ = refresh_species_data(client, active_filter)
         return (
-            f"Species could not be created: {exc}",
+            render_status(f"Species could not be created: {exc}", "error"),
             dataframe,
             name,
             scientific_name,
@@ -342,7 +566,9 @@ def create_species_action(
         )
 
     return (
-        f"Created species #{created['id']}: {created['name']}.",
+        render_status(
+            f"Created species #{created['id']}: {created['name']}.", "success"
+        ),
         dataframe,
         "",
         "",
@@ -365,7 +591,10 @@ def create_bird_action(
     if not cleaned_nickname or not cleaned_ring_code:
         dataframe, _, species_dropdown = refresh_birds_data(client)
         return (
-            "Bird could not be created: fill in nickname and ring code.",
+            render_status(
+                "Bird could not be created: fill in nickname and ring code.",
+                "error",
+            ),
             dataframe,
             species_dropdown,
             nickname,
@@ -376,7 +605,9 @@ def create_bird_action(
     if species_id is None:
         dataframe, _, species_dropdown = refresh_birds_data(client)
         return (
-            "Bird could not be created: choose a species first.",
+            render_status(
+                "Bird could not be created: choose a species first.", "error"
+            ),
             dataframe,
             species_dropdown,
             nickname,
@@ -397,7 +628,9 @@ def create_bird_action(
     except (ValueError, TypeError):
         dataframe, _, species_dropdown = refresh_birds_data(client)
         return (
-            "Bird could not be created: age must be a whole number.",
+            render_status(
+                "Bird could not be created: age must be a whole number.", "error"
+            ),
             dataframe,
             species_dropdown,
             nickname,
@@ -407,7 +640,7 @@ def create_bird_action(
     except BirdAPIError as exc:
         dataframe, _, species_dropdown = refresh_birds_data(client)
         return (
-            f"Bird could not be created: {exc}",
+            render_status(f"Bird could not be created: {exc}", "error"),
             dataframe,
             species_dropdown,
             nickname,
@@ -416,7 +649,9 @@ def create_bird_action(
         )
 
     return (
-        f"Created bird #{created['id']}: {created['nickname']}.",
+        render_status(
+            f"Created bird #{created['id']}: {created['nickname']}.", "success"
+        ),
         dataframe,
         species_dropdown,
         "",
@@ -440,7 +675,10 @@ def create_sighting_action(
     if not cleaned_location or not cleaned_observer_name:
         dataframe, _, bird_dropdown = refresh_sightings_data(client, active_observer_filter)
         return (
-            "Sighting could not be created: fill in location and observer name.",
+            render_status(
+                "Sighting could not be created: fill in location and observer name.",
+                "error",
+            ),
             dataframe,
             bird_dropdown,
             spotted_at,
@@ -452,7 +690,9 @@ def create_sighting_action(
     if bird_id is None:
         dataframe, _, bird_dropdown = refresh_sightings_data(client, active_observer_filter)
         return (
-            "Sighting could not be created: choose a bird first.",
+            render_status(
+                "Sighting could not be created: choose a bird first.", "error"
+            ),
             dataframe,
             bird_dropdown,
             spotted_at,
@@ -467,7 +707,10 @@ def create_sighting_action(
     except ValueError:
         dataframe, _, bird_dropdown = refresh_sightings_data(client, active_observer_filter)
         return (
-            "Sighting could not be created: use ISO 8601 format like 2026-03-20T14:30:00.",
+            render_status(
+                "Sighting could not be created: use ISO 8601 format like 2026-03-20T14:30:00.",
+                "error",
+            ),
             dataframe,
             bird_dropdown,
             spotted_at,
@@ -492,7 +735,7 @@ def create_sighting_action(
     except BirdAPIError as exc:
         dataframe, _, bird_dropdown = refresh_sightings_data(client, active_observer_filter)
         return (
-            f"Sighting could not be created: {exc}",
+            render_status(f"Sighting could not be created: {exc}", "error"),
             dataframe,
             bird_dropdown,
             spotted_at,
@@ -502,7 +745,10 @@ def create_sighting_action(
         )
 
     return (
-        f"Created sighting #{created['id']} for bird #{created['bird_id']}.",
+        render_status(
+            f"Created sighting #{created['id']} for bird #{created['bird_id']}.",
+            "success",
+        ),
         dataframe,
         bird_dropdown,
         datetime.now().replace(microsecond=0).isoformat(),
@@ -516,168 +762,246 @@ def build_demo(client: Optional[BirdAPIClient] = None) -> gr.Blocks:
     """Create the Gradio Blocks app for the Bird API integration exercise."""
     api_client = client or BirdAPIClient()
 
-    with gr.Blocks(title=APP_TITLE) as demo:
-        gr.Markdown("# Birds Viewer")
-        gr.Markdown(f"Live data from the Birds API at `{api_client.base_url}`.")
+    with gr.Blocks(title=APP_TITLE, fill_width=True) as demo:
+        gr.HTML(
+            f"""
+            <section class="hero-card">
+              <div class="hero-kicker">Week 6 | Bird API Integration</div>
+              <h1>Birds Viewer</h1>
+              <p>
+                Explore live species, birds, and sighting records from your FastAPI backend at
+                <strong>{api_client.base_url}</strong>. This dashboard is designed for quick inspection,
+                lightweight data entry, and relationship-aware browsing across the whole birds domain.
+              </p>
+              <div class="hero-meta">
+                <span class="hero-chip">Live PostgreSQL data</span>
+                <span class="hero-chip">Species, birds, sightings</span>
+                <span class="hero-chip">Linked dropdown workflows</span>
+                <span class="hero-chip">Filter and refresh ready</span>
+              </div>
+            </section>
+            """
+        )
+        gr.HTML(
+            """
+            <section class="mode-strip">
+              <article class="mode-card">
+                <div class="mode-index">01</div>
+                <h3>Species Registry</h3>
+                <p>Review conservation profiles and add new species with curated status and family inputs.</p>
+              </article>
+              <article class="mode-card">
+                <div class="mode-index">02</div>
+                <h3>Bird Directory</h3>
+                <p>Manage individual birds and connect them directly to the correct species records.</p>
+              </article>
+              <article class="mode-card">
+                <div class="mode-index">03</div>
+                <h3>Sightings Feed</h3>
+                <p>Track observations by bird, observer, and location with readable timestamps.</p>
+              </article>
+            </section>
+            """
+        )
 
-        with gr.Tabs():
-            with gr.Tab("Species"):
-                with gr.Row():
-                    species_filter = gr.Dropdown(
-                        choices=["All", *CONSERVATION_STATUSES],
-                        value="All",
-                        label="Filter by conservation status",
+        with gr.Column(elem_classes="viewer-shell"):
+            with gr.Tabs():
+                with gr.Tab("Species"):
+                    gr.HTML(
+                        """
+                        <section class="panel-heading">
+                          <div class="panel-kicker">Species Registry</div>
+                          <h2>Browse and create species</h2>
+                          <p>Filter by conservation status, inspect the core species table, and add new entries with sensible defaults.</p>
+                        </section>
+                        """
                     )
-                    species_refresh_button = gr.Button("Refresh", variant="secondary")
-
-                species_status = gr.Markdown("Use refresh to load species data.")
-                species_table = gr.Dataframe(
-                    headers=SPECIES_COLUMNS,
-                    value=empty_dataframe(SPECIES_COLUMNS),
-                    interactive=False,
-                    show_search="filter",
-                    wrap=True,
-                    max_height=350,
-                    label="Species",
-                )
-
-                with gr.Accordion("Add new species", open=False):
                     with gr.Row():
-                        species_name = gr.Textbox(
-                            label="Name",
-                            placeholder="e.g. Atlantic Puffin",
+                        species_filter = gr.Dropdown(
+                            choices=["All", *CONSERVATION_STATUSES],
+                            value="All",
+                            label="Filter by conservation status",
                         )
-                        species_scientific_name = gr.Textbox(
-                            label="Scientific name",
-                            placeholder="e.g. Fratercula arctica",
+                        species_refresh_button = gr.Button(
+                            "Refresh", variant="secondary"
                         )
-                    with gr.Row():
-                        species_family = gr.Dropdown(
-                            choices=KNOWN_BIRD_FAMILIES,
-                            label="Family",
-                            filterable=True,
-                            allow_custom_value=True,
-                        )
-                        species_conservation_status = gr.Dropdown(
-                            choices=CONSERVATION_STATUSES,
-                            value=DEFAULT_CONSERVATION_STATUS,
-                            label="Conservation status",
-                        )
-                        species_wingspan = gr.Slider(
-                            minimum=5,
-                            maximum=300,
-                            step=5,
-                            value=DEFAULT_WINGSPAN_CM,
-                            label="Wingspan (cm)",
-                        )
-                    species_create_button = gr.Button(
-                        "Create species",
-                        variant="primary",
+
+                    species_status = gr.HTML(
+                        render_status("Use refresh to load species data.")
+                    )
+                    species_table = gr.Dataframe(
+                        headers=SPECIES_COLUMNS,
+                        value=empty_dataframe(SPECIES_COLUMNS),
+                        interactive=False,
+                        show_search="filter",
+                        wrap=True,
+                        max_height=350,
+                        label="Species",
                     )
 
-            with gr.Tab("Birds"):
-                birds_status = gr.Markdown("Use refresh to load bird data.")
-                birds_table = gr.Dataframe(
-                    headers=BIRDS_COLUMNS,
-                    value=empty_dataframe(BIRDS_COLUMNS),
-                    interactive=False,
-                    show_search="filter",
-                    wrap=True,
-                    max_height=350,
-                    label="Birds",
-                )
-                birds_refresh_button = gr.Button("Refresh", variant="secondary")
-
-                with gr.Accordion("Add new bird", open=False):
-                    with gr.Row():
-                        bird_nickname = gr.Textbox(
-                            label="Nickname",
-                            placeholder="e.g. Skipper",
-                        )
-                        bird_ring_code = gr.Textbox(
-                            label="Ring code",
-                            placeholder="e.g. AB-1234",
-                        )
-                    with gr.Row():
-                        bird_age = gr.Number(
-                            label="Age (years)",
-                            value=0,
-                            minimum=0,
-                            precision=0,
-                        )
-                        bird_species_id = gr.Dropdown(
-                            choices=[],
-                            label="Species",
-                            filterable=True,
-                            allow_custom_value=False,
-                        )
-                    with gr.Row():
-                        birds_refresh_species_button = gr.Button(
-                            "Refresh species list",
-                            variant="secondary",
-                        )
-                        bird_create_button = gr.Button(
-                            "Create bird",
+                    with gr.Accordion("Add new species", open=False):
+                        with gr.Row():
+                            species_name = gr.Textbox(
+                                label="Name",
+                                placeholder="e.g. Atlantic Puffin",
+                            )
+                            species_scientific_name = gr.Textbox(
+                                label="Scientific name",
+                                placeholder="e.g. Fratercula arctica",
+                            )
+                        with gr.Row():
+                            species_family = gr.Dropdown(
+                                choices=KNOWN_BIRD_FAMILIES,
+                                label="Family",
+                                filterable=True,
+                                allow_custom_value=True,
+                            )
+                            species_conservation_status = gr.Dropdown(
+                                choices=CONSERVATION_STATUSES,
+                                value=DEFAULT_CONSERVATION_STATUS,
+                                label="Conservation status",
+                            )
+                            species_wingspan = gr.Slider(
+                                minimum=5,
+                                maximum=300,
+                                step=5,
+                                value=DEFAULT_WINGSPAN_CM,
+                                label="Wingspan (cm)",
+                            )
+                        species_create_button = gr.Button(
+                            "Create species",
                             variant="primary",
                         )
 
-            with gr.Tab("Sightings"):
-                with gr.Row():
-                    observer_filter = gr.Textbox(
-                        label="Filter by observer name",
-                        placeholder="e.g. Nina Peeters",
+                with gr.Tab("Birds"):
+                    gr.HTML(
+                        """
+                        <section class="panel-heading">
+                          <div class="panel-kicker">Bird Directory</div>
+                          <h2>Manage individual birds</h2>
+                          <p>Review each bird alongside its linked species and add new ringed birds with species-aware dropdown selection.</p>
+                        </section>
+                        """
                     )
-                    sightings_refresh_button = gr.Button(
-                        "Refresh", variant="secondary"
+                    with gr.Row():
+                        birds_status = gr.HTML(
+                            render_status("Use refresh to load bird data.")
+                        )
+                        birds_refresh_button = gr.Button(
+                            "Refresh", variant="secondary"
+                        )
+
+                    birds_table = gr.Dataframe(
+                        headers=BIRDS_COLUMNS,
+                        value=empty_dataframe(BIRDS_COLUMNS),
+                        interactive=False,
+                        show_search="filter",
+                        wrap=True,
+                        max_height=350,
+                        label="Birds",
                     )
 
-                sightings_status = gr.Markdown("Use refresh to load sightings data.")
-                sightings_table = gr.Dataframe(
-                    headers=SIGHTINGS_COLUMNS,
-                    value=empty_dataframe(SIGHTINGS_COLUMNS),
-                    interactive=False,
-                    show_search="filter",
-                    wrap=True,
-                    max_height=350,
-                    label="Sightings",
-                )
+                    with gr.Accordion("Add new bird", open=False):
+                        with gr.Row():
+                            bird_nickname = gr.Textbox(
+                                label="Nickname",
+                                placeholder="e.g. Skipper",
+                            )
+                            bird_ring_code = gr.Textbox(
+                                label="Ring code",
+                                placeholder="e.g. AB-1234",
+                            )
+                        with gr.Row():
+                            bird_age = gr.Number(
+                                label="Age (years)",
+                                value=0,
+                                minimum=0,
+                                precision=0,
+                            )
+                            bird_species_id = gr.Dropdown(
+                                choices=[],
+                                label="Species",
+                                filterable=True,
+                                allow_custom_value=False,
+                            )
+                        with gr.Row():
+                            birds_refresh_species_button = gr.Button(
+                                "Refresh species list",
+                                variant="secondary",
+                            )
+                            bird_create_button = gr.Button(
+                                "Create bird",
+                                variant="primary",
+                            )
 
-                with gr.Accordion("Add new sighting", open=False):
+                with gr.Tab("Sightings"):
+                    gr.HTML(
+                        """
+                        <section class="panel-heading">
+                          <div class="panel-kicker">Sightings Feed</div>
+                          <h2>Record bird observations</h2>
+                          <p>Filter the sightings stream, inspect readable observation rows, and add new records tied to existing birds.</p>
+                        </section>
+                        """
+                    )
                     with gr.Row():
-                        sighting_bird_id = gr.Dropdown(
-                            choices=[],
-                            label="Bird",
-                            filterable=True,
-                            allow_custom_value=False,
-                        )
-                        sightings_refresh_birds_button = gr.Button(
-                            "Refresh bird list",
-                            variant="secondary",
-                        )
-                    with gr.Row():
-                        sighting_spotted_at = gr.Textbox(
-                            label="Spotted at (ISO 8601)",
-                            placeholder="e.g. 2026-03-20T14:30:00",
-                            value=datetime.now().replace(microsecond=0).isoformat(),
-                        )
-                        sighting_location = gr.Textbox(
-                            label="Location",
-                            placeholder="e.g. Brussels Park",
-                        )
-                    with gr.Row():
-                        sighting_observer = gr.Textbox(
-                            label="Observer name",
+                        observer_filter = gr.Textbox(
+                            label="Filter by observer name",
                             placeholder="e.g. Nina Peeters",
                         )
-                        sighting_notes = gr.Textbox(
-                            label="Notes (optional)",
-                            placeholder="e.g. Seen near the fountain",
-                            lines=2,
+                        sightings_refresh_button = gr.Button(
+                            "Refresh", variant="secondary"
                         )
-                    sighting_create_button = gr.Button(
-                        "Create sighting",
-                        variant="primary",
+
+                    sightings_status = gr.HTML(
+                        render_status("Use refresh to load sightings data.")
                     )
+                    sightings_table = gr.Dataframe(
+                        headers=SIGHTINGS_COLUMNS,
+                        value=empty_dataframe(SIGHTINGS_COLUMNS),
+                        interactive=False,
+                        show_search="filter",
+                        wrap=True,
+                        max_height=350,
+                        label="Sightings",
+                    )
+
+                    with gr.Accordion("Add new sighting", open=False):
+                        with gr.Row():
+                            sighting_bird_id = gr.Dropdown(
+                                choices=[],
+                                label="Bird",
+                                filterable=True,
+                                allow_custom_value=False,
+                            )
+                            sightings_refresh_birds_button = gr.Button(
+                                "Refresh bird list",
+                                variant="secondary",
+                            )
+                        with gr.Row():
+                            sighting_spotted_at = gr.Textbox(
+                                label="Spotted at (ISO 8601)",
+                                placeholder="e.g. 2026-03-20T14:30:00",
+                                value=datetime.now().replace(microsecond=0).isoformat(),
+                            )
+                            sighting_location = gr.Textbox(
+                                label="Location",
+                                placeholder="e.g. Brussels Park",
+                            )
+                        with gr.Row():
+                            sighting_observer = gr.Textbox(
+                                label="Observer name",
+                                placeholder="e.g. Nina Peeters",
+                            )
+                            sighting_notes = gr.Textbox(
+                                label="Notes (optional)",
+                                placeholder="e.g. Seen near the fountain",
+                                lines=2,
+                            )
+                        sighting_create_button = gr.Button(
+                            "Create sighting",
+                            variant="primary",
+                        )
 
         species_refresh_button.click(
             fn=lambda conservation_status: refresh_species_data(
@@ -814,4 +1138,4 @@ def build_demo(client: Optional[BirdAPIClient] = None) -> gr.Blocks:
 
 
 if __name__ == "__main__":
-    build_demo().launch(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="slate"))
+    build_demo().launch(theme=APP_THEME, css=APP_CSS, footer_links=[])
