@@ -2,6 +2,9 @@ fastapi[standard]==0.135.1
 gradio==6.9.0
 httpx==0.28.1
 pandas==3.0.1
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.10.0+cpu
+torchvision==0.25.0+cpu
 sqlmodel==0.0.37
 psycopg[binary]==3.3.3
 python-dotenv==1.2.2
